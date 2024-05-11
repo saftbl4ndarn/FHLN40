@@ -26,4 +26,60 @@ def calc(x1, x2):
     dt12dx1 = 0.5*E/(1+v) * 0.13
     dt12dx2 = 0.5*E/(1+v) * 0.23
 
+    b1 = -ds1dx1 - dt12dx2
+    b2 = -ds2dx2 - dt12dx1
+    b = [b1, b2]
+    return b
+
+class Network(torch.nn.Module):
+
+    def __init__(self, n_input, n_layers, n_hidden, n_output):
+        super(Network, self).__init__()
+        self.input = torch.nn.Sequential(*[
+                            torch.nn.Linear(n_input, n_hidden),
+                            torch.nn.Tanh()
+                        ])
+        self.hidden = torch.nn.Sequential(*[
+                            torch.nn.Sequential(*[
+                                torch.nn.Linear(n_hidden, n_hidden),
+                                torch.nn.Tanh()]) for _ in range(n_layers-1)
+                        ])
+        self.output = torch.nn.Sequential(*[
+                            torch.nn.Linear(n_hidden, n_output),
+                            torch.nn.Tanh()
+                        ])
     
+    def forward(self, x):
+        x = self.input(x)
+        x = self.hidden(x)
+        x = self.output(x)
+        return x
+
+# Set-up
+x1 = torch.linspace(0, 1, 100).view(-1, 1)
+x2 = torch.linspace(0, 2, 100).view(-1, 1)
+x = torch.stack((x1, x2))
+u = exact_solution(x1, x2)
+
+# Create network
+input = 2
+layers = 3
+hidden = 32
+output = 2
+
+model = Network(input, layers, hidden, output)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+cost_fnc = torch.nn.MSELoss()
+
+epochs = 2001
+for epoch in range(epochs):
+    optimizer.zero_grad()
+    u_pred = model(x)
+    cost = cost_fnc(u_pred, u)
+    cost.backward()
+    optimizer.step()
+
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch}, Loss {loss.item():10.6e}")
+
+
