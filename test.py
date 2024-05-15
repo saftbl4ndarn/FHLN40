@@ -21,3 +21,5 @@ def calc(x1, x2):
     b2 = -ds2dx2 - dt12dx1
     b = [b1, b2]
     return b
+
+print(calc(1, 0))
