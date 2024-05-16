@@ -63,7 +63,7 @@ def analytical(x1, x2):
     return b, eps, sig
 
 # Displacement functions
-def autograd(x1, x2):
+def autodiff(x1, x2):
     def u1(x1, x2):
         return 0.11*x1 + 0.12*x2 + 0.13*x1*x2
 
@@ -142,7 +142,7 @@ x2_vals = torch.linspace(0, 1, 100, requires_grad=True)
 x1, x2 = torch.meshgrid(x1_vals, x2_vals, indexing='ij')
 
 banal, eps_analytic, sig_analytic = analytical(x1, x2)
-bauto, eps_autograd, sig_autograd = autograd(x1, x2)
+bauto, eps_autograd, sig_autograd = autodiff(x1, x2)
 fig = plt.figure(figsize=(12, 6))
 ax1 = fig.add_subplot(111, projection='3d')
 ax1.scatter(x1.detach().numpy(), x2.detach().numpy(), sig_analytic[0]-sig_autograd[0], c=sig_analytic[0]-sig_autograd[0])
@@ -152,8 +152,7 @@ ax1.set_zlabel('Error')
 ax1.set_title('Sigma1 ERROR')
 plt.show()
 
-"""
+
 print("Body forces:")
 print(f"Analytical: {banal}")
 print(f"Autograd: {bauto}")
-"""
