@@ -53,7 +53,7 @@ class Network(torch.nn.Module):
 # Set-up training data
 x1 = torch.linspace(0, 1, 100).view(-1, 1)
 x2 = torch.linspace(0, 2, 100).view(-1, 1)
-x = torch.meshgrid((x1, x2))
+x = torch.meshgrid(x1, x2, indexing="ij")
 u = torch.stack(exact_solution(x1, x2))
 
 # Set-up validation data
